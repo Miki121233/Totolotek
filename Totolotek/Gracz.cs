@@ -6,13 +6,15 @@ namespace Totolotek
 {
     public class Gracz
     {
+        public int id;
         public int liczbaKuponow = 0;
         public Kupon[] kupon = new Kupon[10];
         public double pieniadze;
         public Gracz() {}
-        public Gracz(double startowePieniadze)
+        public Gracz(double startowePieniadze, int id)
         {
             //this.nazwa = nazwa;
+            this.id = id;
             this.pieniadze = startowePieniadze;
         }
         public void zakupKuponu()

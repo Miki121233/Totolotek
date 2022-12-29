@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Totolotek
@@ -15,11 +16,11 @@ namespace Totolotek
             this.liczbaDni = liczbaDni;
         }
 
-        public static void zapisGry(Gracz[] gracz)
+        public static void zapisGry(List<Gracz> gracz)
         {
             var jsonsettings = new Newtonsoft.Json.JsonSerializerSettings();
             jsonsettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.All;
-            Zapis zapis = new Zapis(Program.liczbaGraczy, ZarzadzanieGra.nrGracza, ZarzadzanieGra.numerDnia);
+            Zapis zapis = new Zapis(Menu.liczbaGraczy, ZarzadzanieGra.nrGracza, ZarzadzanieGra.numerDnia);
             var serializedGracz = Newtonsoft.Json.JsonConvert.SerializeObject(gracz, Newtonsoft.Json.Formatting.Indented, jsonsettings);
             var serializedZapis = Newtonsoft.Json.JsonConvert.SerializeObject(zapis, Newtonsoft.Json.Formatting.Indented, jsonsettings);
 
@@ -59,9 +60,9 @@ namespace Totolotek
             {
                 content2 = sr.ReadToEnd();
             }
-            ZarzadzanieGra.graczWczytany = Newtonsoft.Json.JsonConvert.DeserializeObject<Gracz[]>(content1, jsonsettings);
+            ZarzadzanieGra.graczWczytany = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Gracz>>(content1, jsonsettings);
             Zapis zapis = Newtonsoft.Json.JsonConvert.DeserializeObject<Zapis>(content2, jsonsettings);
-            Program.liczbaGraczy = zapis.liczbaGraczy;
+            Menu.liczbaGraczy = zapis.liczbaGraczy;
             ZarzadzanieGra.nrGracza = zapis.nrGracza;
             ZarzadzanieGra.numerDnia = zapis.liczbaDni;
             ZarzadzanieGra.wczytano = true;

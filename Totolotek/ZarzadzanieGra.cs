@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Totolotek
 {
@@ -9,28 +11,30 @@ namespace Totolotek
         public static bool wczytano = false;
         public static double startowePieniadze = 100;
         public static int nrGracza = 0; //gracz 1 zaczyna
-        public int liczbaGraczy = Program.liczbaGraczy;
+        public int liczbaGraczy = Menu.liczbaGraczy;
         public static bool koniecGry = false;
-        public static int[] wylosowaneLiczby = new int[6];
+        public static List<int> wylosowaneLiczby = new List<int>();
         public static int numerDnia = 0;
-        public static Gracz[] graczWczytany;
+        public static List<Gracz> graczWczytany;
 
 
 
 
         public static void start(int liczbaGraczy)
         {
-            Gracz[] gracz =  new Gracz[liczbaGraczy];
+            List<Gracz> gracz =  new List<Gracz>();
+            int wykluczonyGracz = 0;
 
             for (int j = 0; j < liczbaGraczy; j++)
             {
                 if (wczytano == true)
                 {
-                    gracz[j] = graczWczytany[j];
+                    gracz.Add(graczWczytany[j]);
+                    //gracz[j] = graczWczytany[j];
                 }
                 if (wczytano == false)
                 {
-                    gracz[j] = new Gracz(startowePieniadze); 
+                    gracz.Add(new Gracz(startowePieniadze, (j+1))); 
                 }
             }
             
@@ -40,12 +44,12 @@ namespace Totolotek
             ponownyWybor:
                 if (nrGracza + 1 != liczbaGraczy)
                 {
-                    Console.WriteLine("Dzień "+(numerDnia+1)+"\nTura gracza " + (nrGracza + 1) + "\nStan konta: " + gracz[nrGracza].pieniadze + " zł\n1. Kup kupon(- 10 zł / sztuka)\n" +
+                    Console.WriteLine("Dzień "+(numerDnia+1)+"\nTura gracza " + gracz[nrGracza].id + "\nStan konta: " + gracz[nrGracza].pieniadze + " zł\n1. Kup kupon(- 10 zł / sztuka)\n" +
                       "2. Wyświetl swoje kupony\n3. Koniec tury\n4. Zapis gry\n5. Wróć do menu\n");
                 }
                 else 
                 {
-                    Console.WriteLine("Dzień " + (numerDnia + 1) + "\nTura gracza " + (nrGracza + 1) + "\nStan konta: " + gracz[nrGracza].pieniadze + " zł\n1. Kup kupon(- 10 zł / sztuka)\n" +
+                    Console.WriteLine("Dzień " + (numerDnia + 1) + "\nTura gracza " + gracz[nrGracza].id + "\nStan konta: " + gracz[nrGracza].pieniadze + " zł\n1. Kup kupon(- 10 zł / sztuka)\n" +
                       "2. Wyświetl swoje kupony\n3. Kumulacja\n4. Zapis gry\n5. Wróć do menu\n");
                 }
             bladKonwersji:
@@ -77,8 +81,24 @@ namespace Totolotek
                                 wyniki(liczbaGraczy, gracz);
                                 for (int j = 0; j < liczbaGraczy; j++)
                                 {
-                                    if(gracz[j].pieniadze<=0)
-                                        Console.WriteLine("Gracz "+(j+1)+" przegrywa!");
+                                    if (gracz[j].pieniadze <= 0)
+                                    { 
+                                        Console.WriteLine("Gracz " + gracz[j].id + " przegrywa!");
+                                        gracz.Remove(gracz[j]);
+                                        wykluczonyGracz++;
+                                        if (wykluczonyGracz == liczbaGraczy-1)
+                                        { 
+                                            Console.Clear();
+                                            Console.WriteLine("W grze pozostał ostatni gracz!\n");
+                                        }
+                                        if (wykluczonyGracz == liczbaGraczy) 
+                                        { 
+                                            koniecGry = true;
+                                            Console.Clear();
+                                            Console.WriteLine("Koniec gry!");
+                                        }
+                                    }
+                                    
                                 }
                                 for(int i = 0;i<liczbaGraczy;i++)
                                 {
@@ -94,7 +114,7 @@ namespace Totolotek
                     case 4:
                         {
                             Zapis.zapisGry(gracz);
-                           
+                          
                             goto ponownyWybor;
                         }
                         break;
@@ -114,16 +134,16 @@ namespace Totolotek
             
         }
 
-        static void wyniki(int liczbaGraczy, Gracz[] gracz)
+        static void wyniki(int liczbaGraczy, List<Gracz> gracz)
         {
             losowanie();
             Console.WriteLine("Wyniki:\nWylosowane liczby: " + wylosowaneLiczby[0] + ", " + wylosowaneLiczby[1] + ", " + wylosowaneLiczby[2] + ", " +
-                    wylosowaneLiczby[3] + ", " + wylosowaneLiczby[4] + ", " + wylosowaneLiczby[5]);
+                    wylosowaneLiczby[3] + ", " + wylosowaneLiczby[4] + ", " + wylosowaneLiczby[5]+"\n");
 
             int iloscWylosowanychLiczb = 0;
             for (int i = 0; i < liczbaGraczy; i++)
             {
-                Console.WriteLine("Gracz nr. "+(i+1));
+                Console.WriteLine("Gracz nr. "+ gracz[i].id);
                 gracz[i].wyswietlKupony();
                 Console.WriteLine();
                 for (int j = 0; j < gracz[i].liczbaKuponow; j++)
@@ -167,13 +187,18 @@ namespace Totolotek
         }
 
         static void losowanie()
-        { // 0-50, 15-60, 30-70, 45-80, 60-90, 75-100
+        {
+            for(int i=0; i<wylosowaneLiczby.Count;i++)
+            {
+                wylosowaneLiczby.Remove(i);
+            }
+            // 0-50, 15-60, 30-70, 45-80, 60-90, 75-100
             int start = 0; //0-60
             int stop = 50; //0-100
             Random rand = new Random();
             for (int j = 0; j < 6; j++)
             {
-                wylosowaneLiczby[j] = rand.Next(start, stop);
+                wylosowaneLiczby.Add(rand.Next(start, stop));
                 start = start + 15;
                 stop = stop + 10;
             }
