@@ -150,8 +150,12 @@ namespace Totolotek
                 {
                     for (int k = 0; k < 6; k++)
                     {
-                        if (gracz[i].kupon[j].liczby[k] == wylosowaneLiczby[k])
-                        { iloscWylosowanychLiczb++; }
+                        for(int l = 0; l < 6; l++) 
+                        {
+                            if (gracz[i].kupon[j].liczby[k] == wylosowaneLiczby[l])
+                            { iloscWylosowanychLiczb++; }
+                        }
+                        
                         przyznanieNagrody(iloscWylosowanychLiczb, gracz[i]);
                         iloscWylosowanychLiczb = 0;
                     }
