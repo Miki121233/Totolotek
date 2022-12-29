@@ -14,18 +14,25 @@ namespace Totolotek
         public static int[] wylosowaneLiczby = new int[6];
         public static int numerDnia = 0;
         //public static Zapis zapis;
+        public static Gracz[] graczWczytany;
+
 
 
 
         public static void start(int liczbaGraczy)
         {
-             Gracz[] gracz = new Gracz[liczbaGraczy];
+            Gracz[] gracz =  new Gracz[liczbaGraczy];
 
             for (int j = 0; j < liczbaGraczy; j++)
             {
-                
+                if (wczytano == true)
+                {
+                    gracz[j] = graczWczytany[j];
+                }
                 if (wczytano == false)
-                { gracz[j] = new Gracz(startowePieniadze); }
+                {
+                    gracz[j] = new Gracz(startowePieniadze); 
+                }
             }
             
 
@@ -129,7 +136,7 @@ namespace Totolotek
             {
                 content2 = sr.ReadToEnd();
             }
-            Gracz[] gracz = Newtonsoft.Json.JsonConvert.DeserializeObject<Gracz[]>(content1, jsonsettings);
+            graczWczytany = Newtonsoft.Json.JsonConvert.DeserializeObject<Gracz[]>(content1, jsonsettings);
             Zapis zapis = Newtonsoft.Json.JsonConvert.DeserializeObject<Zapis>(content2, jsonsettings);
             Program.liczbaGraczy = zapis.liczbaGraczy;
             ZarzadzanieGra.nrGracza = zapis.nrGracza;
