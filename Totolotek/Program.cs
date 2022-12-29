@@ -27,14 +27,17 @@ namespace Totolotek
                             goto bladKonwersji;
                         }
                         ZarzadzanieGra.start(liczbaGraczy);
+                        Console.Clear();
                         goto menu;
                     }
                     break;
                 
                 case '2':
                     {
-                        ZarzadzanieGra.wczytanieGry();
+                        Console.Clear();
+                        Zapis.wczytanieGry();
                         ZarzadzanieGra.start(liczbaGraczy);
+                        Console.Clear();
                         goto menu;
                     }
                     break;
@@ -47,7 +50,6 @@ namespace Totolotek
                             goto bladKonwersji;
                         }
                         goto menu;
-
                     }
                     break;
                 default:
